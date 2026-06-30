@@ -39,12 +39,13 @@ def analyze_document(pages: list[dict], filename: str) -> AnalysisResponse:
             # Camada 3: LLM Judge (Zona Cinzenta: Scores entre 50 e 90)
             if 50.0 <= score < 90.0:
                 llm_used = True
-                llm_score = check_llm_judge(chunk)
-                if llm_score >= 0: # -1.0 significa falha na requisição ao Ollama
-                    score = llm_score
-                    layer = "LLM Judge"
-                else:
-                    ollama_failed = True
+                if not ollama_failed:
+                    llm_score = check_llm_judge(chunk)
+                    if llm_score >= 0: # -1.0 significa falha na requisição ao Ollama
+                        score = llm_score
+                        layer = "LLM Judge"
+                    else:
+                        ollama_failed = True
             
             if score > max_risk_score:
                 max_risk_score = score

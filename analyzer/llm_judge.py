@@ -31,7 +31,7 @@ Resposta (apenas SIM ou NAO):
                     "temperature": 0.0 # Respostas mais determinísticas
                 }
             },
-            timeout=10 # Timeout para não travar o processo
+            timeout=5 # Timeout super curto: se for local, responde na hora. Se não, não trava a API.
         )
         
         if response.status_code == 200:
