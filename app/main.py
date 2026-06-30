@@ -6,7 +6,17 @@ from analyzer.pipeline import analyze_document
 from utils.pdf_parser import extract_text_from_pdf
 import os
 
-app = FastAPI(title="Sensor de Injeção de Prompt - TJMS")
+app = FastAPI(
+    title="API de Detecção de Injeção de Prompt - TJMS",
+    version="1.0.0",
+    description="""
+Microsserviço on-premise para triagem de segurança em documentos jurídicos.
+Esta API processa arquivos PDF em memória e utiliza um pipeline híbrido (Heurísticas, ML Local e LLM) para detectar tentativas de injeção de prompt, retornando um score de risco e o veredito sem alterar o arquivo original.
+    """,
+    docs_url="/api/docs",
+    redoc_url="/api/redoc",
+    openapi_url="/api/openapi.json"
+)
 
 app.add_middleware(
     CORSMiddleware,
@@ -16,8 +26,14 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.post("/analyze", response_model=AnalysisResponse)
-async def analyze_pdf(file: UploadFile = File(...)):
+@app.post(
+    "/api/v1/analyze", 
+    response_model=AnalysisResponse,
+    tags=["Análise de Segurança"],
+    summary="Analisar Documento PDF",
+    description="Recebe um arquivo PDF via form-data (UploadFile), extrai o texto integralmente em memória e o submete às 3 camadas de detecção de injeção de prompt. Retorna o veredito final, score de risco geral e a lista de trechos marcados como suspeitos."
+)
+async def analyze_pdf(file: UploadFile = File(..., description="Arquivo PDF do processo jurídico a ser analisado.")):
     if not file.filename.endswith('.pdf'):
         raise HTTPException(status_code=400, detail="Somente arquivos PDF são suportados.")
     

@@ -59,6 +59,7 @@ Para executar o projeto, a maneira mais fácil e segura contra problemas de comp
    docker-compose up --build
    ```
 4. Aguarde a finalização da compilação e a inicialização do servidor `uvicorn`.
-5. Abra o navegador e acesse: [http://localhost:8000](http://localhost:8000)
+5. Abra o navegador e acesse a interface web em: [http://localhost:8000](http://localhost:8000)
+6. Para visualizar o **Contrato da API (Swagger)** e testar os endpoints documentados, acesse: [http://localhost:8000/api/docs](http://localhost:8000/api/docs)
 
 *(Nota: Toda vez que você editar códigos `.py` do backend, você precisará parar o terminal com `Ctrl + C` e rodar o comando acima novamente para que as alterações do Python tenham efeito. Já o frontend (HTML/CSS/JS) atualiza apenas com F5).*

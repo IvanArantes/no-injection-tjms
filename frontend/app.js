@@ -65,8 +65,8 @@ btnAnalyze.addEventListener('click', async () => {
             // Simulação visual das camadas
             simulateLayersProgress();
             
-            // Chamada real à API
-            const response = await fetch('/analyze', {
+            // Chamada real à API (Versionada)
+            const response = await fetch('/api/v1/analyze', {
                 method: 'POST',
                 body: formData
             });
