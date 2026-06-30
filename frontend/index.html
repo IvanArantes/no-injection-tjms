@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sensor de Injeção de Prompt - TJMS</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="top-nav">
+        <div class="brand">
+            <svg class="logo" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            </svg>
+            <div class="brand-text">
+                <h1>Sensor de Injeção de Prompt <span>· Triagem Jurídica</span></h1>
+                <p id="current-step-label">Etapa 1 · Envio do documento</p>
+            </div>
+        </div>
+        <div class="badge">
+            <span class="dot"></span> On-premise · sem nuvem
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="stepper">
+            <div class="step active" data-step="1"><div class="circle">1</div> Upload</div>
+            <div class="line"></div>
+            <div class="step" data-step="2"><div class="circle">2</div> Análise</div>
+            <div class="line"></div>
+            <div class="step" data-step="3"><div class="circle">3</div> Resultado</div>
+        </div>
+
+        <!-- Passo 1: Upload -->
+        <section id="step-1" class="step-content active">
+            <div class="content-header">
+                <h2>Enviar petição para triagem de segurança</h2>
+                <p>O texto nativo do PDF é lido em memória (buffer do upload) e processado em janelas deslizantes de sentenças. O arquivo integral nunca é gravado em disco.</p>
+            </div>
+
+            <div class="upload-area" id="drop-zone">
+                <div class="upload-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="12" y1="18" x2="12" y2="12"></line>
+                        <line x1="9" y1="15" x2="15" y2="15"></line>
+                    </svg>
+                </div>
+                <h3>Arraste o PDF do processo aqui</h3>
+                <p>ou selecione um arquivo do seu dispositivo</p>
+                <input type="file" id="file-input" accept=".pdf" hidden>
+                
+                <div id="file-preview" class="file-preview hidden">
+                    <span id="file-name"></span>
+                    <span class="status-badge">pronto</span>
+                </div>
+            </div>
+
+            <div class="info-box">
+                <h4>Privacidade por design</h4>
+                <p>Comandos embutidos no documento são tratados estritamente como dado e ignorados. Apenas metadados e trechos suspeitos são retidos — nunca o documento completo.</p>
+            </div>
+
+            <button id="btn-analyze" class="btn-primary" disabled>
+                <span class="btn-text">Analisar documento</span>
+                <div class="spinner spinner-btn hidden"></div>
+            </button>
+        </section>
+
+        <!-- Passo 2: Analisando -->
+        <section id="step-2" class="step-content hidden">
+            <div class="content-header">
+                <h2>Analisando documento</h2>
+                <p>Detecção híbrida de 3 camadas em execução local. Nenhum dado sai do ambiente on-premise.</p>
+            </div>
+
+            <div class="analysis-layers">
+                <div class="layer-item" id="layer-extraction">
+                    <div class="layer-icon spinner"></div>
+                    <div class="layer-text">
+                        <h4>Extração do texto nativo em memória</h4>
+                        <p>Buffer do upload · sem persistência em disco</p>
+                    </div>
+                </div>
+                <div class="layer-item pending" id="layer-chunking">
+                    <div class="layer-icon"></div>
+                    <div class="layer-text">
+                        <h4>Chunking em janelas deslizantes de sentenças</h4>
+                        <p>Pré-processamento do texto não estruturado</p>
+                    </div>
+                </div>
+                <div class="layer-item pending" id="layer-heuristics">
+                    <div class="layer-icon"></div>
+                    <div class="layer-text">
+                        <h4>Camada 1 · Heurísticas rápidas</h4>
+                        <p>Padrões e marcadores conhecidos</p>
+                    </div>
+                </div>
+                <div class="layer-item pending" id="layer-ml">
+                    <div class="layer-icon"></div>
+                    <div class="layer-text">
+                        <h4>Camada 2 · Classificador ML local</h4>
+                        <p>Score de risco local por trecho (0-100%)</p>
+                    </div>
+                </div>
+                <div class="layer-item pending" id="layer-llm">
+                    <div class="layer-icon"></div>
+                    <div class="layer-text">
+                        <h4>Camada 3 · LLM-juiz local (sob demanda)</h4>
+                        <p>Apenas para trechos na zona cinzenta · Ollama / CPU</p>
+                    </div>
+                    <span class="processing-text hidden">processando...</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Passo 3: Resultado -->
+        <section id="step-3" class="step-content hidden">
+            <div class="result-header">
+                <div class="verdict-card" id="verdict-card">
+                    <div class="verdict-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                        </svg>
+                    </div>
+                    <div class="verdict-info">
+                        <h2>Veredito: <span id="verdict-text">Seguro</span></h2>
+                        <p>Score de Risco Máximo: <span id="verdict-score">0%</span></p>
+                        <p class="llm-status-text">Análise Profunda (LLM): <strong id="llm-used-status">Não Necessária</strong></p>
+                    </div>
+                </div>
+                <div class="header-actions">
+                    <button class="btn-secondary" onclick="resetApp()">Analisar Novo</button>
+                </div>
+            </div>
+
+            <div id="ollama-warning" class="alert-warning hidden">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                <div>
+                    <strong>Aviso:</strong> Não foi possível conectar ao Ollama para a verificação profunda (Camada 3). O score exibido é o resultado exclusivo das Camadas 1 e 2.
+                </div>
+            </div>
+
+            <div class="snippets-section">
+                <h3>Trechos Suspeitos Encontrados <span class="badge-count" id="snippet-count">0</span></h3>
+                <div id="snippets-container" class="snippets-container">
+                    <!-- Snippets injetados via JS -->
+                </div>
+            </div>
+
+            <div class="action-bar">
+                <button class="btn-success" onclick="alert('Documento classificado como Seguro pelo revisor humano.')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                    Aceitar
+                </button>
+                <button class="btn-danger" onclick="alert('Documento rejeitado e movido para quarentena.')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>
+                    Rejeitar
+                </button>
+                <button class="btn-warning" onclick="alert('Documento encaminhado para fila de Análise Humana Especializada.')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12h4l2-9 5 18 3-10h6"></path></svg>
+                    Verificação Humana
+                </button>
+            </div>
+        </section>
+    </main>
+
+    <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,12 @@
+version: '3.8'
+
+services:
+  api:
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+    environment:
+      # O Ollama rodando localmente na máquina hospedeira pode ser acessado via host.docker.internal
+      - OLLAMA_HOST=http://host.docker.internal:11434
